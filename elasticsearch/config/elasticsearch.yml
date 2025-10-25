@@ -1,0 +1,31 @@
+# Cluster configuration
+cluster.name: ${ELASTICSEARCH_CLUSTER_NAME:es-docker-cluster}
+node.name: ${ELASTICSEARCH_NODE_NAME:elasticsearch}
+
+# Network settings
+network.host: 0.0.0.0
+http.port: 9200
+
+# Discovery settings for single node
+discovery.type: single-node
+
+# Memory settings
+bootstrap.memory_lock: true
+
+# Security settings (disabled for development)
+xpack.security.enabled: false
+xpack.security.enrollment.enabled: false
+
+# Monitoring
+xpack.monitoring.collection.enabled: true
+
+# License settings
+xpack.license.self_generated.type: basic
+
+# Performance settings
+thread_pool.write.queue_size: 1000
+
+# Path settings
+path:
+  data: /usr/share/elasticsearch/data
+  logs: /usr/share/elasticsearch/logs

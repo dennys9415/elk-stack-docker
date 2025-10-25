@@ -1,0 +1,29 @@
+# Logstash configuration file
+
+# Node identity
+node.name: logstash
+
+# Path settings
+path:
+  data: /usr/share/logstash/data
+  logs: /usr/share/logstash/logs
+
+# Pipeline settings
+pipeline:
+  workers: 2
+  batch:
+    size: 125
+    delay: 50
+
+# Monitoring settings
+xpack.monitoring.enabled: true
+xpack.monitoring.elasticsearch.hosts: ["http://elasticsearch:9200"]
+xpack.monitoring.elasticsearch.username: elastic
+xpack.monitoring.elasticsearch.password: changeme
+
+# HTTP API settings
+http.host: "0.0.0.0"
+http.port: 9600
+
+# Log level (debug, info, warn, error)
+log.level: info

@@ -1,0 +1,57 @@
+name: Docker Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Build Elasticsearch image
+      run: |
+        cd elasticsearch
+        docker build -t elk-elasticsearch:test .
+    
+    - name: Build Logstash image
+      run: |
+        cd logstash
+        docker build -t elk-logstash:test .
+    
+    - name: Build Kibana image
+      run: |
+        cd kibana
+        docker build -t elk-kibana:test .
+    
+    - name: Start services
+      run: docker-compose up -d
+      
+    - name: Wait for services to be ready
+      run: |
+        sleep 45
+        ./scripts/health-check.sh
+        
+    - name: Check Elasticsearch health
+      run: |
+        curl -f http://localhost:9200/_cluster/health || exit 1
+        
+    - name: Check Kibana status
+      run: |
+        curl -f http://localhost:5601/api/status || exit 1
+        
+    - name: Check Logstash API
+      run: |
+        curl -f http://localhost:9600/ || exit 1
+        
+    - name: Cleanup
+      if: always()
+      run: docker-compose down

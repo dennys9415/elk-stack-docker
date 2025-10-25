@@ -1,0 +1,50 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/lib/docker/containers/*/*.log
+  json:
+    keys_under_root: true
+    add_error_key: true
+    message_key: log
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/*.log
+    - /var/log/syslog
+    - /var/log/messages
+
+processors:
+  - add_docker_metadata:
+      host: "unix:///var/run/docker.sock"
+  - add_cloud_metadata: ~
+  - add_host_metadata: ~
+  - decode_json_fields:
+      fields: ["message"]
+      target: "json"
+      overwrite_keys: true
+
+# Optional: Add custom fields
+fields:
+  env: development
+  project: elk-stack
+
+# Logstash output
+output.logstash:
+  hosts: ["logstash:5044"]
+
+# Enable modules (optional)
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+# Logging (optional)
+logging:
+  level: info
+  to_files: true
+  files:
+    path: /usr/share/filebeat/logs
+    name: filebeat.log
+    keepfiles: 7
+    permissions: 0644

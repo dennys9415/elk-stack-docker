@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.11.0
+    container_name: filebeat
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - elk
+    depends_on:
+      - logstash
+    restart: unless-stopped
+
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:8.11.0
+    container_name: metricbeat
+    volumes:
+      - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
